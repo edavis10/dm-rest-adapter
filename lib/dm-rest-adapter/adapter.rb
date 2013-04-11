@@ -71,8 +71,12 @@ module DataMapperRest
     def normalized_uri
       @normalized_uri ||=
         begin
-          query = @options.except(:adapter, :user, :password, :host, :port, :path, :fragment)
-          query = nil if query.empty?
+          query = @options.except(:adapter, :user, :password, :host, :port, :path, :fragment, :scheme)
+          # Empty query or a query with only nil values
+          if query.empty? || (query.all? {|_,value| value.nil?})
+            query = nil
+          end
+
 
           Addressable::URI.new(
             :scheme       => 'http',
